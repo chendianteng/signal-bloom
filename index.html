@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#07100f" />
+<meta name="application-name" content="Signal Bloom" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Signal Bloom" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <title>Signal Bloom · 一线生光</title>
 <style>
@@ -18,6 +25,7 @@
 <footer><div class="bottom-row"><div class="difficulty"><button data-size="3" data-i18n="size3">入门 3×3</button><button data-size="5" data-i18n="size5">轻松 5×5</button><button data-size="7" data-i18n="size7" class="active">标准 7×7</button><button data-size="9" data-i18n="size9">挑战 9×9</button></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button class="secondary" id="answerBtn" style="padding:7px 11px;font-size:12px">查看答案</button><div class="hint" data-i18n="hint">R 新游戏 · Z 撤销</div></div></div><div class="progress"><div class="fill" id="fill"></div></div></footer>
 </div>
 <script>
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 (()=>{'use strict';
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),overlay=document.getElementById('overlay'),playBtn=document.getElementById('playBtn'),soundBtn=document.getElementById('soundBtn'),movesEl=document.getElementById('moves'),bestEl=document.getElementById('best'),connectedEl=document.getElementById('connected'),fill=document.getElementById('fill'),overlayTitle=document.getElementById('overlayTitle'),overlayText=document.getElementById('overlayText'),answerBtn=document.getElementById('answerBtn');
 const LANGUAGE_KEY='miniGameLanguage',i18n={zh:{subtitle:'旋转线路，让整座网络重新发光。',moves:'步数',best:'最佳',connected:'连通',startTitle:'让光路连起来',startText:'点击方块旋转线路，让能量种子连接所有节点，且不能留下任何断开的线路。',source:'能量种子',lit:'已连接',unlit:'未连接',controls:'<b>左键 / 轻触</b> 顺时针旋转，<b>右键</b> 逆时针旋转。',start:'开始游戏',next:'下一局',soundOn:'声音：开',soundOff:'声音：关',showAnswer:'查看答案',hideAnswer:'隐藏答案',size3:'入门 3×3',size5:'轻松 5×5',size7:'标准 7×7',size9:'挑战 9×9',hint:'R 新游戏 · Z 撤销',winTitle:'整张光网亮起来了',winText:({moves,size})=>`你用了 <b style="color:#5ee6a8;font-size:1.25em">${moves}</b> 步完成 ${size}×${size} 棋盘。`},en:{subtitle:'Rotate the paths and bring the network back to life.',moves:'Moves',best:'Best',connected:'Connected',startTitle:'Bring the network to life',startText:'Rotate the tiles to connect every node to the energy source without leaving any broken paths.',source:'Energy source',lit:'Connected',unlit:'Disconnected',controls:'<b>Click / tap</b> to rotate clockwise; <b>right-click</b> to rotate counterclockwise.',start:'Start game',next:'Next puzzle',soundOn:'Sound: On',soundOff:'Sound: Off',showAnswer:'Show solution',hideAnswer:'Hide solution',size3:'Beginner 3×3',size5:'Easy 5×5',size7:'Normal 7×7',size9:'Challenge 9×9',hint:'R New puzzle · Z Undo',winTitle:'The whole network is glowing',winText:({moves,size})=>`You completed the ${size}×${size} board in <b style="color:#5ee6a8;font-size:1.25em">${moves}</b> moves.`}};
