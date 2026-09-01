@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Signal Bloom｜一线生光</title>
+<style>
+:root{--bg:#07100f;--panel:#0d1a18;--line:#213633;--text:#ecfdf5;--muted:#86a79f;--green:#5ee6a8;--cyan:#67e8f9;--gold:#facc6b}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:radial-gradient(circle at 15% 10%,rgba(94,230,168,.12),transparent 30%),radial-gradient(circle at 85% 80%,rgba(103,232,249,.08),transparent 32%),#06100e;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;padding:18px}
+.app{width:min(96vw,900px);min-height:min(94vh,860px);display:grid;grid-template-rows:auto 1fr auto;gap:12px}header{display:flex;justify-content:space-between;gap:14px;align-items:center}.brand h1{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.04em}.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.pill{min-width:78px;padding:8px 11px;border:1px solid rgba(134,167,159,.14);background:rgba(13,26,24,.88);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.2);text-align:center}.pill span{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}.pill strong{display:block;font-size:18px;margin-top:2px}.shell{position:relative;min-height:0;display:grid;place-items:center;padding:14px;border:1px solid rgba(134,167,159,.13);background:rgba(8,20,18,.72);border-radius:24px;box-shadow:0 30px 90px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.035);overflow:hidden}canvas{display:block;width:min(100%,calc(94vh - 220px));height:auto;aspect-ratio:1;border-radius:18px;background:#091512;touch-action:none;cursor:pointer}.overlay{position:absolute;inset:14px;border-radius:18px;background:rgba(3,12,10,.76);backdrop-filter:blur(6px);display:grid;place-items:center;padding:22px;transition:.2s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.card{max-width:540px;text-align:center}.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.card h2{margin:8px 0 10px;font-size:clamp(28px,6vw,52px);line-height:1;letter-spacing:-.05em}.card p{color:#bfd4ce;line-height:1.6;margin:8px auto}.legend{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:16px 0;color:#d5e5e0;font-size:13px}.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:6px}.actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}button{border:0;border-radius:13px;padding:11px 18px;font-size:14px;font-weight:800;cursor:pointer;color:#052018;background:linear-gradient(135deg,var(--green),var(--cyan));box-shadow:0 10px 28px rgba(94,230,168,.18)}button.secondary{color:var(--text);background:rgba(134,167,159,.10);border:1px solid rgba(134,167,159,.18);box-shadow:none}footer{display:grid;gap:10px}.bottom-row{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.difficulty{display:flex;gap:6px;flex-wrap:wrap}.difficulty button{padding:7px 11px;font-size:12px;color:#bdd1cb;background:rgba(134,167,159,.09);border:1px solid rgba(134,167,159,.12);box-shadow:none}.difficulty button.active{background:rgba(94,230,168,.16);color:var(--green);border-color:rgba(94,230,168,.32)}.progress{height:8px;flex:1;min-width:180px;border-radius:999px;overflow:hidden;background:rgba(134,167,159,.10)}.fill{width:0%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width .25s ease}.hint{color:var(--muted);font-size:12px}@media(max-width:700px){body{display:block;padding:10px 0;overflow:auto}.app{width:100%;min-height:96vh;height:auto;padding:0 10px}header{align-items:flex-start}.brand p{font-size:11px;max-width:190px}.stats{gap:5px}.pill{min-width:61px;padding:6px 7px}.pill strong{font-size:15px}.shell{padding:8px;border-radius:18px}.overlay{inset:8px}canvas{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand"><h1>Signal Bloom</h1><p>一线生光 · 旋转线路，让整座网络重新发光。</p></div><div class="stats"><div class="pill"><span>步数</span><strong id="moves">0</strong></div><div class="pill"><span>最佳</span><strong id="best">—</strong></div><div class="pill"><span>连通</span><strong id="connected">0%</strong></div></div></header>
+<main class="shell"><canvas id="game" width="720" height="720"></canvas><div class="overlay" id="overlay"><div class="card"><div class="eyebrow">Signal Bloom · 一线生光</div><h2 id="overlayTitle">让光路连起来</h2><p id="overlayText">点击方块旋转线路，让能量种子连接所有节点，且不能留下任何断开的线路。</p><div class="legend"><span><i style="background:#facc6b"></i>能量种子</span><span><i style="background:#5ee6a8"></i>已连接</span><span><i style="background:#29443d"></i>未连接</span></div><p><b>左键 / 轻触</b> 顺时针旋转，<b>右键</b> 逆时针旋转。</p><div class="actions"><button id="playBtn">开始游戏</button><button class="secondary" id="soundBtn">声音：开</button></div></div></div></main>
+<footer><div class="bottom-row"><div class="difficulty"><button data-size="3">入门 3×3</button><button data-size="5">轻松 5×5</button><button data-size="7" class="active">标准 7×7</button><button data-size="9">挑战 9×9</button></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button class="secondary" id="answerBtn" style="padding:7px 11px;font-size:12px">查看答案</button><div class="hint">R 新游戏 · Z 撤销</div></div></div><div class="progress"><div class="fill" id="fill"></div></div></footer>
+</div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),overlay=document.getElementById('overlay'),playBtn=document.getElementById('playBtn'),soundBtn=document.getElementById('soundBtn'),movesEl=document.getElementById('moves'),bestEl=document.getElementById('best'),connectedEl=document.getElementById('connected'),fill=document.getElementById('fill'),overlayTitle=document.getElementById('overlayTitle'),overlayText=document.getElementById('overlayText'),answerBtn=document.getElementById('answerBtn');
+const dirs=[{dx:0,dy:-1,bit:1,opp:4},{dx:1,dy:0,bit:2,opp:8},{dx:0,dy:1,bit:4,opp:1},{dx:-1,dy:0,bit:8,opp:2}];let N=7,grid=[],source={x:0,y:0},moves=0,history=[],started=false,won=false,sound=true,audioCtx=null,particles=[],showAnswer=false;const key=(x,y)=>y*N+x,rnd=n=>Math.floor(Math.random()*n),bestKey=()=>`signalBloomBest_${N}`;
+function rotate(mask,cw=true){return cw?((mask<<1)&15)|((mask>>3)&1):((mask>>1)&7)|((mask&1)<<3)}
+function tone(freq=260,d=.08,type='sine',gain=.035){if(!sound)return;try{audioCtx||=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(gain,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch(e){}}
+function generate(){
+  // Build a known-valid solved network first, then scramble only by rotating tiles.
+  // Because rotations are reversible, every generated puzzle has at least one solution.
+  let attempts=0;
+
+  while(attempts++ < 100){
+    grid = Array.from({length:N},()=>Array.from({length:N},()=>({mask:0,on:false,depth:0,solvedMask:0})));
+    source={x:rnd(N),y:rnd(N)};
+
+    // Randomized spanning tree with reciprocal connections.
+    const visited=new Set([key(source.x,source.y)]);
+    const frontier=[];
+
+    function addFront(x,y){
+      for(const d of dirs){
+        const nx=x+d.dx, ny=y+d.dy;
+        if(nx>=0&&ny>=0&&nx<N&&ny<N&&!visited.has(key(nx,ny))){
+          frontier.push({x,y,nx,ny,d});
+        }
+      }
+    }
+
+    addFront(source.x,source.y);
+
+    while(visited.size < N*N && frontier.length){
+      const idx=rnd(frontier.length);
+      const e=frontier.splice(idx,1)[0];
+      if(visited.has(key(e.nx,e.ny))) continue;
+
+      grid[e.y][e.x].mask |= e.d.bit;
+      grid[e.ny][e.nx].mask |= e.d.opp;
+
+      visited.add(key(e.nx,e.ny));
+      addFront(e.nx,e.ny);
+    }
+
+    if(visited.size !== N*N) continue;
+
+    // Add a small number of extra reciprocal loops.
+    const extra = Math.floor(N*N*.08);
+    for(let i=0;i<extra;i++){
+      const x=rnd(N), y=rnd(N), d=dirs[rnd(4)];
+      const nx=x+d.dx, ny=y+d.dy;
+      if(nx>=0&&ny>=0&&nx<N&&ny<N){
+        grid[y][x].mask |= d.bit;
+        grid[ny][nx].mask |= d.opp;
+      }
+    }
+
+    // Save the exact known solution.
+    for(let y=0;y<N;y++){
+      for(let x=0;x<N;x++){
+        grid[y][x].solvedMask=grid[y][x].mask;
+      }
+    }
+
+    // Defensive validation: the pre-scramble board itself must be fully solved.
+    if(!evaluate().solved) continue;
+
+    // Scramble using reversible rotations only.
+    let scrambled=false;
+    for(let scrambleTry=0;scrambleTry<30;scrambleTry++){
+      for(let y=0;y<N;y++){
+        for(let x=0;x<N;x++){
+          grid[y][x].mask=grid[y][x].solvedMask;
+          const turns=rnd(4);
+          for(let t=0;t<turns;t++){
+            grid[y][x].mask=rotate(grid[y][x].mask,true);
+          }
+        }
+      }
+
+      if(!evaluate().solved){
+        scrambled=true;
+        break;
+      }
+    }
+
+    if(!scrambled) continue;
+
+    moves=0;
+    history=[];
+    won=false;
+    started=true;
+    particles=[];
+    showAnswer=false;
+    answerBtn.textContent='查看答案';
+    update();
+    draw();
+    return;
+  }
+
+  setTimeout(generate,0);
+}
+function evaluate(){for(const row of grid)for(const c of row){c.on=false;c.depth=0}const q=[source],seen=new Set([key(source.x,source.y)]);grid[source.y][source.x].on=true;let invalid=0;while(q.length){const p=q.shift(),cell=grid[p.y][p.x];for(const d of dirs){if(!(cell.mask&d.bit))continue;const nx=p.x+d.dx,ny=p.y+d.dy;if(nx<0||ny<0||nx>=N||ny>=N){invalid++;continue}const n=grid[ny][nx];if(!(n.mask&d.opp)){invalid++;continue}if(!seen.has(key(nx,ny))){seen.add(key(nx,ny));n.on=true;n.depth=cell.depth+1;q.push({x:nx,y:ny})}}}const total=N*N,connected=seen.size;return{connected,total,invalid,solved:connected===total&&invalid===0}}
+function update(){const r=evaluate();movesEl.textContent=moves;connectedEl.textContent=Math.round(r.connected/r.total*100)+'%';fill.style.width=(r.connected/r.total*100)+'%';const b=localStorage.getItem(bestKey());bestEl.textContent=b||'—';if(r.solved&&!won){won=true;const old=Number(b||0);if(!old||moves<old)localStorage.setItem(bestKey(),moves);bestEl.textContent=localStorage.getItem(bestKey());celebrate();setTimeout(showWin,550)}}
+function rotateCell(x,y,cw=true){if(!started||won)return;const before=evaluate().connected;history.push({x,y,mask:grid[y][x].mask});grid[y][x].mask=rotate(grid[y][x].mask,cw);moves++;const after=evaluate().connected;tone(after>before?330:after<before?190:260,.05,after>before?'sine':'triangle',.028);update()}
+function undo(){if(!history.length||won)return;const h=history.pop();grid[h.y][h.x].mask=h.mask;moves=Math.max(0,moves-1);tone(190,.05,'sine',.02);update()}
+function showWin(){overlayTitle.textContent='整张光网亮起来了';overlayText.innerHTML=`你用了 <b style="color:#5ee6a8;font-size:1.25em">${moves}</b> 步完成 ${N}×${N} 棋盘。`;playBtn.textContent='下一局';overlay.classList.remove('hidden');tone(720,.18,'sine',.04);setTimeout(()=>tone(920,.22,'sine',.035),120)}
+function celebrate(){const size=canvas.width/N;for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(Math.random()<.55)particles.push({x:(x+.5)*size,y:(y+.5)*size,vx:(Math.random()-.5)*3,vy:-1-Math.random()*3,life:40+rnd(25),h:145+rnd(55)})}
+function drawConnector(cx,cy,len,angle,color,width){ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-len);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.stroke();ctx.restore()}
+function roundRect(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);const bg=ctx.createRadialGradient(360,330,30,360,360,500);bg.addColorStop(0,'#10231e');bg.addColorStop(1,'#06100e');ctx.fillStyle=bg;ctx.fillRect(0,0,720,720);const s=720/N,gap=Math.max(4,s*.055),pulse=performance.now()/550;for(let y=0;y<N;y++)for(let x=0;x<N;x++){const c=grid[y]?.[x];if(!c)continue;const px=x*s,py=y*s,cx=px+s/2,cy=py+s/2,on=c.on;ctx.fillStyle=on?'rgba(34,75,61,.72)':'rgba(16,34,29,.86)';ctx.strokeStyle=on?'rgba(94,230,168,.18)':'rgba(134,167,159,.08)';ctx.lineWidth=1;roundRect(ctx,px+gap,py+gap,s-gap*2,s-gap*2,Math.max(8,s*.13));ctx.fill();ctx.stroke();const col=on?'#5ee6a8':'#29443d',w=Math.max(7,s*.105),len=s*.40;if(c.mask&1)drawConnector(cx,cy,len,0,col,w);if(c.mask&2)drawConnector(cx,cy,len,Math.PI/2,col,w);if(c.mask&4)drawConnector(cx,cy,len,Math.PI,col,w);if(c.mask&8)drawConnector(cx,cy,len,-Math.PI/2,col,w);ctx.save();if(on){ctx.shadowBlur=14;ctx.shadowColor='#5ee6a8'}ctx.fillStyle=(x===source.x&&y===source.y)?'#facc6b':col;ctx.beginPath();ctx.arc(cx,cy,Math.max(7,s*.105)+(on?Math.sin(pulse+c.depth*.5)*1.2:0),0,Math.PI*2);ctx.fill();ctx.restore();if(x===source.x&&y===source.y){ctx.strokeStyle='rgba(250,204,107,.45)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,s*.20+Math.sin(pulse)*2,0,Math.PI*2);ctx.stroke()}}if(showAnswer&&started&&!won){
+  ctx.save();
+  ctx.globalAlpha=.30;
+  const ss=720/N;
+  for(let sy=0;sy<N;sy++)for(let sx=0;sx<N;sx++){
+    const sc=grid[sy]?.[sx];if(!sc)continue;
+    const sm=sc.solvedMask??sc.mask;
+    const ccx=(sx+.5)*ss,ccy=(sy+.5)*ss,sl=ss*.31,sw=Math.max(3,ss*.045);
+    ctx.strokeStyle='#facc6b';ctx.fillStyle='#facc6b';ctx.lineWidth=sw;ctx.lineCap='round';
+    ctx.shadowBlur=6;ctx.shadowColor='#facc6b';
+    const seg=(bit,dx,dy)=>{if(!(sm&bit))return;ctx.beginPath();ctx.moveTo(ccx,ccy);ctx.lineTo(ccx+dx*sl,ccy+dy*sl);ctx.stroke()};
+    seg(1,0,-1);seg(2,1,0);seg(4,0,1);seg(8,-1,0);
+    ctx.beginPath();ctx.arc(ccx,ccy,Math.max(2.5,ss*.035),0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
+}particles.forEach(p=>{ctx.fillStyle=`hsla(${p.h},85%,68%,${Math.max(0,p.life/65)})`;ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill();p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.life--});particles=particles.filter(p=>p.life>0)}
+function animate(){draw();requestAnimationFrame(animate)}function cellAt(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;return{x:Math.floor(x/(canvas.width/N)),y:Math.floor(y/(canvas.height/N))}}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();const p=cellAt(e);if(p.x>=0&&p.y>=0&&p.x<N&&p.y<N)rotateCell(p.x,p.y,true)});canvas.addEventListener('contextmenu',e=>{e.preventDefault();const p=cellAt(e);rotateCell(p.x,p.y,false)});playBtn.addEventListener('click',()=>{overlay.classList.add('hidden');generate()});soundBtn.addEventListener('click',()=>{sound=!sound;soundBtn.textContent=`声音：${sound?'开':'关'}`});answerBtn.addEventListener('click',()=>{if(!started)return;showAnswer=!showAnswer;answerBtn.textContent=showAnswer?'隐藏答案':'查看答案';tone(showAnswer?420:240,.05,'sine',.018)});document.querySelectorAll('[data-size]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-size]').forEach(x=>x.classList.remove('active'));b.classList.add('active');N=Number(b.dataset.size);overlay.classList.add('hidden');generate()}));addEventListener('keydown',e=>{if(e.code==='KeyR'){overlay.classList.add('hidden');generate()}else if(e.code==='KeyZ')undo()});generate();started=false;overlay.classList.remove('hidden');animate();})();
+</script>
+</body>
+</html>
