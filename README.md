@@ -24,3 +24,7 @@ Rotate the tiles until the energy source connects the entire network.
 ## Deployment
 
 Designed for GitHub Pages.
+
+## Play
+
+[Play online](https://chendianteng.github.io/signal-bloom/)
